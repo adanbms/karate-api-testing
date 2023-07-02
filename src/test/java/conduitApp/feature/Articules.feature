@@ -2,11 +2,13 @@ Feature: Articules for Conduit APP
 
 Background: Login and get token
     Given url 'https://api.realworld.io/api'
-    Given path 'users/login'
-    And request {"user": {"email": "bmerino@test.com","password": "bmerino1234"}}
-    When method Post
-    Then status 200
-    * def token = response.user.token
+    # Given path 'users/login'
+    # And request {"user": {"email": "bmerino@test.com","password": "bmerino1234"}}
+    # When method Post
+    # Then status 200
+    # * def token = response.user.token
+    * def callResult = call read('classpath:helpers/GetAuthToken.feature')
+    * def token = callResult.authToken
 
 @CreateArticle
 Scenario: Create a new article
