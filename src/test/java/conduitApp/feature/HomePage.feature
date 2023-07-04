@@ -15,17 +15,33 @@ Scenario: Get all tags
     And match each response.tags == '#string'
     And match response.tags contains any ['fish', 'dog', 'welcome']
     And match response.tags !contains 'truck'
-    #A variation of that is contains only expression
 
 @GetArticles
 Scenario: Get 10 articles from the page
+    * def timeValidator = read("classpath:helpers/time-validator.js")
+
     Given params {limit:10, offset:0}
-    Given path 'articles'
+    And path 'articles'
     When method Get
     Then status 200
     And match response == {"articles": '#array', "articlesCount": '##number'}
-    And match response.articlesCount != 100
-    And match response.articles[0].createdAt !contains '1997'
-    And match response.articles[*].favoritesCount contains 1216
-    And match response..bio contains null
-    And match each response..username != null
+    And match each response.articles == 
+    """
+        {
+            "slug": "#string",
+            "title": "#string",
+            "description": "#string",
+            "body": "#string",
+            "tagList": '#array',
+            "createdAt": '#? timeValidator(_)',
+            "updatedAt": '#? timeValidator(_)',
+            "favorited": '#boolean',
+            "favoritesCount": '#number',
+            "author": {
+                "username": "#string",
+                "bio": '##string',
+                "image": "#string",
+                "following": '#boolean'
+            }
+        }
+    """
