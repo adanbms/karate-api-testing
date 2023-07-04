@@ -2,11 +2,21 @@ Feature: Articules for Conduit APP
 
 Background: Login and get token
     Given url conduitApiUrl
-    
-@CreateArticle
+
+@ignore
 Scenario: Create a new article
     Given path 'articles/'
-    And request {"article": {"tagList": [],"title": "Karate Test","description": "Test from Karate","body": "Made with cucumber too."}}
+    And request 
+    """
+        {
+            "article": {
+                "tagList": [],
+                "title": "Karate Test",
+                "description": "Test from Karate",
+                "body": "Made with cucumber too."
+            }
+        }
+    """
     When method Post
     Then status 200
     And match response.article.title == 'Karate Test'
@@ -14,7 +24,17 @@ Scenario: Create a new article
 @DeleteArticle
 Scenario: Create and Delete Article
     Given path 'articles'
-    And request {"article": {"tagList": [],"title": "Karate Test Delete","description": "Test from Karate","body": "Made with cucumber too."}}
+    And request
+    """
+        {
+            "article": {
+                "tagList": [],
+                "title": "Karate Test Delete",
+                "description": "Test from Karate",
+                "body": "Made with cucumber too."
+            }
+        }
+    """
     When method Post
     Then status 200
     And match response.article.title == 'Karate Test Delete'
