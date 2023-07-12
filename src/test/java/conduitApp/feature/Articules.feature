@@ -56,4 +56,18 @@ Scenario: Create and Delete Article
     Then status 200
     And match response.articles[0].title != 'Karate Test Delete'
 
+@CreateJson
+Scenario: Create a new article using json file
+    * def dataGenerator = Java.type("helpers.DataGenerator")
+    * def randomDataObj = dataGenerator.getRandomArticle()
+    * def requetBody = read("classpath:conduitApp/json/CreateArticleRequest.json")
+    
+    * set requetBody.article.title = randomDataObj.title
+    * set requetBody.article.description = randomDataObj.description
+    * set requetBody.article.body = randomDataObj.body
 
+    Given path 'articles/'
+    And request requetBody
+    When method Post
+    Then status 200
+    And match response.article.title == requetBody.article.title
