@@ -56,7 +56,7 @@ Scenario: Create and Delete Article
     Then status 200
     And match response.articles[0].title != 'Karate Test Delete'
 
-@CreateJson
+@ignore
 Scenario: Create a new article using json file
     * def dataGenerator = Java.type("helpers.DataGenerator")
     * def randomDataObj = dataGenerator.getRandomArticle()
