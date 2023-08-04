@@ -17,7 +17,7 @@ Feature: Home Work
         * def slugId = response.articles[0].slug
 
         # Step 3: Make POST request to increse favorites count for the first article
-        Given path slugId + '/favorite'
+        Given path 'articles/' + slugId + '/favorite'
         When method Post
         Then status 200
 
@@ -54,13 +54,13 @@ Feature: Home Work
                 "username": "#string",
                 "password": "#string",
                 "image": "#string",
-                "bio": "#string",
+                "bio": "##string",
                 "demo": "#boolean"
             }
             """
 
         # Step 5: Verify that favorites article incremented by 1
-        And match response.favoritesCount == favoritesCount + 1
+        And match response.article.favoritesCount == favoritesCount + 1
 
         # Step 6: Get all favorite articles
         Given path 'articles'
@@ -92,6 +92,12 @@ Feature: Home Work
         # Step 8: Verify that slug ID from Step 2 exist in one of the favorite articles
         And match response.articles[*].slug contains slugId
 
+        # Step 9: Quit favorite added by us and return article to initial values
+        Given path 'articles/' + slugId + '/favorite'
+        When method Delete
+        Then status 200
+        And assert response.article.favoritesCount == favoritesCount
+
     Scenario: Comment articles
         # Step 1: Get atricles of the global feed
         Given path 'articles'
@@ -102,7 +108,7 @@ Feature: Home Work
         * def slugId = response.articles[0].slug
 
         # Step 3: Make a GET call to 'comments' end-point to get all comments
-        Given path slugId + '/comments'
+        Given path 'articles/' + slugId + '/comments'
         When method Get
         Then status 200
 
@@ -128,43 +134,45 @@ Feature: Home Work
 
         # Step 6: Make a POST request to publish a new comment
         * def commentText = 'Testing comment.'
-        Given path slugId + '/comments'
+        Given path 'articles/' + slugId  + '/comments'
         And request {comment: {body: "#(commentText)"}}
         When method Post
         Then status 200
 
         # Step 7: Verify response schema that should contain posted comment text
-        And match response.comment ==
+        And match response.comment == 
             """
             {
-            "id": "#number",
-            "createdAt": "#? timeValidator(_)",
-            "updatedAt": "#? timeValidator(_)",
-            "body": "#(commentText)",
-            "author": {
-            "username": "#string",
-            "bio": "##string",
-            "image": "#string",
-            "following": "#boolean"
+                "id": "#number",
+                "createdAt": "#? timeValidator(_)",
+                "updatedAt": "#? timeValidator(_)",
+                "body": "#(commentText)",
+                "author": {
+                    "username": "#string",
+                    "bio": "##string",
+                    "image": "#string",
+                    "following": "#boolean"
+                }
             }
             """
+
         * def commentId = response.comment.id
 
         # Step 8: Get the list of all comments for this article one more time
-        Given path slugId + '/comments'
+        Given path 'articles/' + slugId  + '/comments'
         When method Get
         Then status 200
 
         # Step 9: Verify number of comments increased by 1 (similar like we did with favorite counts)
-        And match response.comments.lenght == commentsCount+1
+        And assert response.comments.length == commentsCount+1
 
         # Step 10: Make a DELETE request to delete comment
-        Given path slugId + '/comments/' + commentId
+        Given path 'articles/' + slugId  + '/comments/' + commentId
         When method Delete
         Then status 200
 
         # Step 11: Get all comments again and verify number of comments decreased by 1
-        Given path slugId + '/comments'
+        Given path 'articles/' + slugId  + '/comments'
         When method Get
         Then status 200
-        And match response.comments.lenght == commentsCount
+        And assert response.comments.length == commentsCount
